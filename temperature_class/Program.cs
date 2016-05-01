@@ -1,91 +1,124 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
 
 namespace temperature_class
 {
 	class MainClass
 	{
 		public static void Main (string[] args)
-		{
-			// variables for validation
-			Boolean numOnly = false; // value to see if ID is numeric only. Gets set to true if validation is positive
-			Boolean correctTemp = false; // value to see if temp is actually a temp. Gets set to true if validation is positive. 
-			Boolean correctUnit = false; // value to see if unit is valid. Gets set to true if validation is positive. 
-			Boolean correctSite = false; // value to see if location is present in list. Gets set to true if validation is positive.
-			Boolean correctInfo = false; // value to see if user is happy with their inputs. Gets set to true if validation is positive.
+		{	
+			progFlow ();
+			Environment.Exit (0);
+		}
+
+		public static void progFlow(){
+			Boolean isCorrectInfo = false; // value to see if user is happy with their inputs. Gets set to true if validation is positive.
 			// print main header, then ask for person id to store the information under
-			while (correctInfo == false) {
+			while (isCorrectInfo == false) {
 				LineOutputs.MainHeader ();
-				LineOutputs.EnterPersonId ();
-				// validate the person id as only containing numeric chars. will continue until it gets numeric only.
-				var unvalidatedId = Console.ReadLine ();
-				numOnly = Validators.validateId (unvalidatedId);
-				while (numOnly == false) {
-					LineOutputs.InvalidId ();
-					unvalidatedId = Console.ReadLine ();
-					numOnly = Validators.validateId (unvalidatedId);
-				}
-				var validatedId = Convert.ToDecimal (unvalidatedId);
+				var validatedId = getId ();
 				// if successful, escape while, create new tempsubject to put the information in
 				var subject = new TempSubject (validatedId);
-
-
 				// ask for temperature
 				LineOutputs.EnterTemp ();
-				var unvalidatedTemp = Console.ReadLine ();
-				correctTemp = Validators.validateNumeric (unvalidatedTemp);
-				while (correctTemp == false) {
-					LineOutputs.InvalidTemp ();
-					unvalidatedTemp = Console.ReadLine ();
-					correctTemp = Validators.validateNumeric (unvalidatedTemp);
-				}
-				var validatedTemp = Convert.ToDecimal (unvalidatedTemp);
+				var validatedTemp = getTemp ();
 				// dump into object
 				subject.PatientTemp = validatedTemp;
-
-
 				// ask for temp unit
 				LineOutputs.EnterUnits ();
-				var unvalidatedUnit = Console.ReadLine ();
-				correctUnit = Validators.validateUnits (unvalidatedUnit);
-				while (correctUnit == false) {
-					LineOutputs.InvalidUnit ();
-					unvalidatedUnit = Console.ReadLine ();
-					correctUnit = Validators.validateUnits (unvalidatedUnit);
-				}
-				var validatedUnit = unvalidatedUnit;
+				var validatedUnit = getUnit();
 				// dump into object
 				subject.TemperatureUnit = validatedUnit;
-
 				// ask for site
 				LineOutputs.EnterSite ();
 				LineOutputs.PrintSiteMenu ();
-				var unvalidatedSite = Console.ReadLine ();
-				correctSite = Validators.validateSite (unvalidatedSite);
-				while (correctSite == false) {
-					LineOutputs.InvalidSite ();
-					unvalidatedSite = Console.ReadLine ();
-					correctSite = Validators.validateSite (unvalidatedSite);
-				}
-				var validatedSite = LineOutputs.sites [(Convert.ToInt32 (unvalidatedSite) - 1)];
+				var validatedSite = getSite ();
 				// dump into object
 				subject.TemperatureLocation = validatedSite;
-
 				// Print object properties
-				//http://stackoverflow.com/questions/4023462/how-do-i-automatically-display-all-properties-of-a-class-and-their-values-in-a-s
+				// http://stackoverflow.com/questions/4023462/how-do-i-automatically-display-all-properties-of-a-class-and-their-values-in-a-s
 				LineOutputs.PrintProperties (subject);
-
 				// confirm that this is the correct info
-				LineOutputs.ConfirmInputs ();
-				var unvalidatedInfo = Console.ReadLine ();
-				correctInfo = Validators.validateInputs (unvalidatedInfo);
+				var validateInfo = confirmFinal();
+				if (validateInfo == true) {
+					string fileLine = subject.PatientId + "," + subject.PatientTemp + "," + subject.TemperatureUnit + "," + subject.TemperatureLocation + "," + DateTime.UtcNow;
+					if (Environment.OSVersion.Platform.ToString () == "Unix") {
+						File.AppendAllText (@"/home/" + Environment.UserName + "/temperature_class_file.csv", fileLine);
+
+					}
+					Console.WriteLine ("Add another set of data? (y/n): ");
+					var selection = Console.ReadLine ();
+					if (selection == "y" || selection == "Y") {
+						progFlow ();
+					} else if( selection == "n" || selection == "N" ){
+						Environment.Exit (0);
+					}
+				}
 			}
+		}
 
-			// write out or some crap.
+		public static Decimal getId(){
+			Boolean isValidId = false; // value to see if ID is numeric only. Gets set to true if validation is positive1
+			LineOutputs.EnterPersonId ();
+			// validate the person id as only containing numeric chars. will continue until it gets numeric only.
+			var unvalidatedId = Console.ReadLine ();
+			isValidId = Validators.validateId (unvalidatedId);
+			while (isValidId == false) {
+				LineOutputs.InvalidId ();
+				unvalidatedId = Console.ReadLine ();
+				isValidId = Validators.validateId (unvalidatedId);
+			}
+			return Convert.ToDecimal (unvalidatedId);
+		}
 
-			Console.WriteLine ("Thanks!");
+		public static Decimal getTemp(){
+			Boolean isValidTemp = false; // value to see if temp is actually a temp. Gets set to true if validation is positive. 
+			var unvalidatedTemp = Console.ReadLine ();
+			isValidTemp = Validators.validateNumeric (unvalidatedTemp);
+			while (isValidTemp == false) {
+				LineOutputs.InvalidTemp ();
+				unvalidatedTemp = Console.ReadLine ();
+				isValidTemp = Validators.validateNumeric (unvalidatedTemp);
+			}
+			return Convert.ToDecimal (unvalidatedTemp);
+		}
 
+		public static String getUnit(){
+			Boolean isValidUnit = false; // value to see if unit is valid. Gets set to true if validation is positive. 
+			var unvalidatedUnit = Console.ReadLine ();
+			isValidUnit = Validators.validateUnits (unvalidatedUnit);
+			while (isValidUnit == false) {
+				LineOutputs.InvalidUnit ();
+				unvalidatedUnit = Console.ReadLine ();
+				isValidUnit = Validators.validateUnits (unvalidatedUnit);
+			}
+			return unvalidatedUnit;
+		}
+
+		public static string getSite(){
+			Boolean isCorrectSite = false; // value to see if location is present in list. Gets set to true if validation is positive.
+			var unvalidatedSite = Console.ReadLine ();
+			isCorrectSite = Validators.validateSite (unvalidatedSite);
+			while (isCorrectSite == false) {
+				LineOutputs.InvalidSite ();
+				unvalidatedSite = Console.ReadLine ();
+				isCorrectSite = Validators.validateSite (unvalidatedSite);
+			}
+			return LineOutputs.sites [(Convert.ToInt32 (unvalidatedSite) - 1)];
+		}
+
+		public static Boolean confirmFinal(){
+			Boolean isCorrectInfo; // value to see if user is happy with their inputs. Gets set to true if validation is positive.
+			LineOutputs.ConfirmInputs ();
+			var unvalidatedInfo = Console.ReadLine ();
+			isCorrectInfo = Validators.validateInputs (unvalidatedInfo);
+			if (isCorrectInfo == true) {
+				return true;
+			} else {
+				return false;
+			}
 		}
 	}
 	/// <summary>
@@ -94,6 +127,9 @@ namespace temperature_class
 	class Validators
 	{
 		public static Boolean validateInputs(string text){
+			if (isNull (text) == true) {
+				MainClass.confirmFinal ();
+			}
 			switch (text) {
 			case "y":
 			case "Y":
@@ -112,7 +148,9 @@ namespace temperature_class
 		}
 
 		public static Boolean validateSite(string text){
-			// TODO: need to validate that text only has numeric chars
+			if (isNull (text) == true) {
+				return false;
+			}
 			var textChar = Convert.ToChar(text);
 			if (text.Length > 1 || !Char.IsNumber (textChar)) {
 				return false;
@@ -127,8 +165,12 @@ namespace temperature_class
 			}
 		}
 
-		public static Boolean validateId(string idText){
-			foreach (char c in idText) {
+		public static Boolean validateId(string text){
+			if (isNull (text) == true) {
+				return false;
+			}
+
+			foreach (char c in text) {
 				if (Char.IsLetter (c) || Char.IsPunctuation (c) || Char.IsWhiteSpace (c) || Char.IsControl (c))
 					return false;
 				else
@@ -138,6 +180,9 @@ namespace temperature_class
 		}
 
 		public static Boolean validateNumeric(string text){
+			if (isNull (text) == true) {
+				return false;
+			}
 			var cCount = 0;
 			foreach (char c in text) {
 				if (Char.IsDigit(c) || Char.IsNumber(c) || c == '.')	// add validation to make sure there's only one decimal
@@ -150,11 +195,22 @@ namespace temperature_class
 		}
 
 		public static Boolean validateUnits(string text){
+			if (isNull (text) == true) {
+				return false;
+			}
 			if(text == "f" || text == "F" || text == "c" || text == "C" )
 				return true;
 			else
 				return false;
+		}
+		public static Boolean isNull (string text){
+			if (String.IsNullOrEmpty (text)) {
+				return true;
+			} else {
+				return false;
 			}
+		}
+
 		}
 	}
 
@@ -186,7 +242,7 @@ namespace temperature_class
 	{
 		public static string[] sites = { "Oral", "Temporal", "Tympanic", "Axillary", "Rectal" };	// http://adctoday.com/learning-center/about-thermometers/how-take-temperature
 		public static void MainHeader(){
-			Console.WriteLine ("Welcome to the temperature program.");
+			Console.WriteLine ("Welcome to the temperature program. Press CTRL + C to exit at any time.");
 			Dashes ();
 			return;
 		}
@@ -207,7 +263,7 @@ namespace temperature_class
 		}
 		public static void InvalidId(){
 			printInvalid ();
-			Console.WriteLine ("Enter only numbers, no symbols or letters). Please try again: ");
+			Console.WriteLine ("Enter only numbers, no symbols or letters. Please try again: ");
 			return;
 		}
 
@@ -240,8 +296,7 @@ namespace temperature_class
 			}
 			return;
 		}
-		public static void PrintSiteMenu(){
-			
+		public static void PrintSiteMenu(){			
 			for (int i = 0; i < sites.Length; i++) {
 				Console.WriteLine ((i + 1) + ". " + sites [i]);
 			}
