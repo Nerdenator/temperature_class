@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace temperature_class
 {
@@ -12,63 +13,79 @@ namespace temperature_class
 			Boolean correctTemp = false; // value to see if temp is actually a temp. Gets set to true if validation is positive. 
 			Boolean correctUnit = false; // value to see if unit is valid. Gets set to true if validation is positive. 
 			Boolean correctSite = false; // value to see if location is present in list. Gets set to true if validation is positive.
-
+			Boolean correctInfo = false; // value to see if user is happy with their inputs. Gets set to true if validation is positive.
 			// print main header, then ask for person id to store the information under
-			LineOutputs.MainHeader ();
-			LineOutputs.EnterPersonId ();
-			// validate the person id as only containing numeric chars. will continue until it gets numeric only.
-			var unvalidatedId = Console.ReadLine();
-			numOnly = Validators.validateId (unvalidatedId);
-			while (numOnly == false) {
-				LineOutputs.InvalidId();
-				unvalidatedId = Console.ReadLine ();
+			while (correctInfo == false) {
+				LineOutputs.MainHeader ();
+				LineOutputs.EnterPersonId ();
+				// validate the person id as only containing numeric chars. will continue until it gets numeric only.
+				var unvalidatedId = Console.ReadLine ();
 				numOnly = Validators.validateId (unvalidatedId);
-			}
-			var validatedId = Convert.ToDecimal(unvalidatedId);
-			// if successful, escape while, create new tempsubject to put the information in
-			var subject = new TempSubject(validatedId);
+				while (numOnly == false) {
+					LineOutputs.InvalidId ();
+					unvalidatedId = Console.ReadLine ();
+					numOnly = Validators.validateId (unvalidatedId);
+				}
+				var validatedId = Convert.ToDecimal (unvalidatedId);
+				// if successful, escape while, create new tempsubject to put the information in
+				var subject = new TempSubject (validatedId);
 
 
-			// ask for temperature
-			LineOutputs.EnterTemp();
-			var unvalidatedTemp = Console.ReadLine ();
-			correctTemp = Validators.validateNumeric (unvalidatedTemp);
-			while (correctTemp == false) {
-				LineOutputs.InvalidTemp ();
-				unvalidatedTemp = Console.ReadLine ();
+				// ask for temperature
+				LineOutputs.EnterTemp ();
+				var unvalidatedTemp = Console.ReadLine ();
 				correctTemp = Validators.validateNumeric (unvalidatedTemp);
-			}
-			var validatedTemp = Convert.ToDecimal (unvalidatedTemp);
-			// dump into object
-			subject.PatientTemp = validatedTemp;
+				while (correctTemp == false) {
+					LineOutputs.InvalidTemp ();
+					unvalidatedTemp = Console.ReadLine ();
+					correctTemp = Validators.validateNumeric (unvalidatedTemp);
+				}
+				var validatedTemp = Convert.ToDecimal (unvalidatedTemp);
+				// dump into object
+				subject.PatientTemp = validatedTemp;
 
 
-			// ask for temp unit
-			LineOutputs.EnterUnits();
-			var unvalidatedUnit = Console.ReadLine ();
-			correctUnit = Validators.validateUnits (unvalidatedUnit);
-			while (correctUnit == false) {
-				LineOutputs.InvalidUnit ();
-				unvalidatedUnit = Console.ReadLine ();
+				// ask for temp unit
+				LineOutputs.EnterUnits ();
+				var unvalidatedUnit = Console.ReadLine ();
 				correctUnit = Validators.validateUnits (unvalidatedUnit);
-			}
-			var validatedUnit = unvalidatedUnit;
-			// dump into object
-			subject.TemperatureUnit = validatedUnit;
+				while (correctUnit == false) {
+					LineOutputs.InvalidUnit ();
+					unvalidatedUnit = Console.ReadLine ();
+					correctUnit = Validators.validateUnits (unvalidatedUnit);
+				}
+				var validatedUnit = unvalidatedUnit;
+				// dump into object
+				subject.TemperatureUnit = validatedUnit;
 
-			// ask for site
-			LineOutputs.EnterSite();
-			LineOutputs.PrintSiteMenu ();
-			var unvalidatedSite = Console.ReadLine ();
-			correctSite = Validators.validateSite (unvalidatedSite);
-			while (correctSite == false) {
-				LineOutputs.InvalidSite ();
-				unvalidatedSite = Console.ReadLine ();
+				// ask for site
+				LineOutputs.EnterSite ();
+				LineOutputs.PrintSiteMenu ();
+				var unvalidatedSite = Console.ReadLine ();
 				correctSite = Validators.validateSite (unvalidatedSite);
+				while (correctSite == false) {
+					LineOutputs.InvalidSite ();
+					unvalidatedSite = Console.ReadLine ();
+					correctSite = Validators.validateSite (unvalidatedSite);
+				}
+				var validatedSite = LineOutputs.sites [(Convert.ToInt32 (unvalidatedSite) - 1)];
+				// dump into object
+				subject.TemperatureLocation = validatedSite;
+
+				// Print object properties
+				//http://stackoverflow.com/questions/4023462/how-do-i-automatically-display-all-properties-of-a-class-and-their-values-in-a-s
+				LineOutputs.PrintProperties (subject);
+
+				// confirm that this is the correct info
+				LineOutputs.ConfirmInputs ();
+				var unvalidatedInfo = Console.ReadLine ();
+				correctInfo = Validators.validateInputs (unvalidatedInfo);
 			}
-			var validatedSite = LineOutputs.sites [(Convert.ToInt32(unvalidatedSite) + 1)];
-			// dump into object
-			subject.TemperatureLocation = validatedSite;
+
+			// write out or some crap.
+
+			Console.WriteLine ("Thanks!");
+
 		}
 	}
 	/// <summary>
@@ -76,7 +93,26 @@ namespace temperature_class
 	/// </summary>
 	class Validators
 	{
+		public static Boolean validateInputs(string text){
+			switch (text) {
+			case "y":
+			case "Y":
+			case "yes":
+			case "Yes":
+				return true;
+			case "n":
+			case "N":
+			case "No":
+			case "no":
+				return false;
+			default:
+				LineOutputs.printInvalid ();
+				return false;
+			}
+		}
+
 		public static Boolean validateSite(string text){
+			// TODO: need to validate that text only has numeric chars
 			var upperBound = (LineOutputs.sites.GetUpperBound (0) + 1);
 			var lowerBound = 1;
 			var boundTest = Convert.ToInt32 (text);
@@ -88,16 +124,13 @@ namespace temperature_class
 		}
 
 		public static Boolean validateId(string idText){
-			var cCount = 0;
 			foreach (char c in idText) {
-				if (Char.IsLetter (c) || Char.IsPunctuation(c) || Char.IsWhiteSpace(c) || Char.IsControl(c))
-					cCount++;
+				if (Char.IsLetter (c) || Char.IsPunctuation (c) || Char.IsWhiteSpace (c) || Char.IsControl (c))
+					return false;
+				else
+					continue;
 			}
-			if (cCount > 0) {
-				return false;
-			} else {
-				return true;
-			}
+			return true;
 		}
 
 		public static Boolean validateNumeric(string text){
@@ -125,7 +158,7 @@ namespace temperature_class
 	/// Base class that contains Dashes(), making it to where one need not include it in 
 	/// printed message methods.
 	/// </summary>
-	class Separator
+	class OutputStrings
 	{
 		protected static void Dashes()
 		{
@@ -135,13 +168,17 @@ namespace temperature_class
 			Console.Write("\n");
 			return;
 		}
+		public static void printInvalid(){
+			Console.WriteLine ("I'm sorry, that's an invalid input");
+			return;
+		}
 	}
 
 
 	/// <summary>
 	/// The "View" for the application. Inherits from Separator for its Dashes() method.
 	/// </summary>
-	class LineOutputs : Separator
+	class LineOutputs : OutputStrings
 	{
 		public static string[] sites = { "Oral", "Temporal", "Tympanic", "Axillary", "Rectal" };	// http://adctoday.com/learning-center/about-thermometers/how-take-temperature
 		public static void MainHeader(){
@@ -149,24 +186,30 @@ namespace temperature_class
 			Dashes ();
 			return;
 		}
+		public static void ConfirmInputs(){
+			Console.WriteLine ("Are these the values you wish to record?(y/n): ");
+			return;
+		}
 		public static void InvalidUnit(){
 			Console.WriteLine ("I'm sorry, that isn't a valid unit.");
-			Separator.Dashes ();
+			Dashes ();
 			return;
 		}
 		public static void InvalidTemp(){
-			Console.WriteLine ("I'm sorry, that isn't a valid temperature.");
-			Separator.Dashes ();
+			printInvalid ();
+			Console.WriteLine ("Enter only an integer or decimal value");
+			Dashes ();
 			return;
 		}
 		public static void InvalidId(){
-			Console.WriteLine ("I'm sorry, that isn't a valid ID (only numbers, no symbols or letters). Please try again: ");
+			printInvalid ();
+			Console.WriteLine ("Enter only numbers, no symbols or letters). Please try again: ");
 			return;
 		}
 
 		public static void EnterTemp(){
 			Console.WriteLine ("Please enter a temperature, up to hundredth of a degree: ");
-			Separator.Dashes ();
+			Dashes ();
 			return;
 		}
 		public static void EnterPersonId(){
@@ -185,6 +228,14 @@ namespace temperature_class
 			Console.WriteLine ("I'm sorry, that isn't a valid site from the menu.");
 		}
 		
+		public static void PrintProperties(TempSubject sub){
+			var props = sub.GetType ().GetProperties ();
+			foreach (var p in props)
+			{
+				Console.WriteLine (p.Name + ": " + p.GetValue (sub, null));
+			}
+			return;
+		}
 		public static void PrintSiteMenu(){
 			
 			for (int i = 0; i < sites.Length; i++) {
@@ -225,9 +276,7 @@ namespace temperature_class
 			get { return temperatureLocation; }
 			set { temperatureLocation = value; }
 		}
-
-		public TempSubject(){
-		}
+		//constructor(s):
 		public TempSubject(Decimal id){
 			patientId = id;
 		}
