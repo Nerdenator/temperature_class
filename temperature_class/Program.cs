@@ -11,6 +11,7 @@ namespace temperature_class
 			Boolean numOnly = false; // value to see if ID is numeric only. Gets set to true if validation is positive
 			Boolean correctTemp = false; // value to see if temp is actually a temp. Gets set to true if validation is positive. 
 			Boolean correctUnit = false; // value to see if unit is valid. Gets set to true if validation is positive. 
+			Boolean correctSite = false; // value to see if location is present in list. Gets set to true if validation is positive.
 
 			// print main header, then ask for person id to store the information under
 			LineOutputs.MainHeader ();
@@ -52,8 +53,22 @@ namespace temperature_class
 				correctUnit = Validators.validateUnits (unvalidatedUnit);
 			}
 			var validatedUnit = unvalidatedUnit;
-			//dump into object
+			// dump into object
 			subject.TemperatureUnit = validatedUnit;
+
+			// ask for site
+			LineOutputs.EnterSite();
+			LineOutputs.PrintSiteMenu ();
+			var unvalidatedSite = Console.ReadLine ();
+			correctSite = Validators.validateSite (unvalidatedSite);
+			while (correctSite == false) {
+				LineOutputs.InvalidSite ();
+				unvalidatedSite = Console.ReadLine ();
+				correctSite = Validators.validateSite (unvalidatedSite);
+			}
+			var validatedSite = LineOutputs.sites [(Convert.ToInt32(unvalidatedSite) + 1)];
+			// dump into object
+			subject.TemperatureLocation = validatedSite;
 		}
 	}
 	/// <summary>
@@ -61,6 +76,17 @@ namespace temperature_class
 	/// </summary>
 	class Validators
 	{
+		public static Boolean validateSite(string text){
+			var upperBound = (LineOutputs.sites.GetUpperBound (0) + 1);
+			var lowerBound = 1;
+			var boundTest = Convert.ToInt32 (text);
+			if (boundTest > upperBound || boundTest < lowerBound)
+				return false;
+			else
+				return true;
+
+		}
+
 		public static Boolean validateId(string idText){
 			var cCount = 0;
 			foreach (char c in idText) {
@@ -117,6 +143,7 @@ namespace temperature_class
 	/// </summary>
 	class LineOutputs : Separator
 	{
+		public static string[] sites = { "Oral", "Temporal", "Tympanic", "Axillary", "Rectal" };	// http://adctoday.com/learning-center/about-thermometers/how-take-temperature
 		public static void MainHeader(){
 			Console.WriteLine ("Welcome to the temperature program.");
 			Dashes ();
@@ -153,8 +180,19 @@ namespace temperature_class
 		public static void EnterSite(){
 			Console.WriteLine ("Please enter the site of the measurement on the subject's body: ");
 		}
-	}
 
+		public static void InvalidSite(){
+			Console.WriteLine ("I'm sorry, that isn't a valid site from the menu.");
+		}
+		
+		public static void PrintSiteMenu(){
+			
+			for (int i = 0; i < sites.Length; i++) {
+				Console.WriteLine ((i + 1) + ". " + sites [i]);
+			}
+		}
+	}
+	
 
 	/// <summary>
 	/// The model for the data. Acts as the "bucket" for our data.
@@ -194,5 +232,3 @@ namespace temperature_class
 			patientId = id;
 		}
 	}
-	
-
