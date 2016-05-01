@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace temperature_class
 {
@@ -34,7 +35,7 @@ namespace temperature_class
 			while (correctTemp == false) {
 				LineOutputs.InvalidTemp ();
 				unvalidatedTemp = Console.ReadLine ();
-				correctTemp = Validators.validateNumeric ();
+				correctTemp = Validators.validateNumeric (unvalidatedTemp);
 			}
 			var validatedTemp = Convert.ToDecimal (unvalidatedTemp);
 			// dump into object
@@ -43,8 +44,16 @@ namespace temperature_class
 
 			// ask for temp unit
 			LineOutputs.EnterUnits();
-
-
+			var unvalidatedUnit = Console.ReadLine ();
+			correctUnit = Validators.validateUnits (unvalidatedUnit);
+			while (correctUnit == false) {
+				LineOutputs.InvalidUnit ();
+				unvalidatedUnit = Console.ReadLine ();
+				correctUnit = Validators.validateUnits (unvalidatedUnit);
+			}
+			var validatedUnit = unvalidatedUnit;
+			//dump into object
+			subject.TemperatureUnit = validatedUnit;
 		}
 	}
 	/// <summary>
@@ -68,7 +77,7 @@ namespace temperature_class
 		public static Boolean validateNumeric(string text){
 			var cCount = 0;
 			foreach (char c in text) {
-				if (Char.IsDigit || Char.IsNumber || c == ".")	// add validation to make sure there's only one decimal
+				if (Char.IsDigit(c) || Char.IsNumber(c) || c == '.')	// add validation to make sure there's only one decimal
 					cCount++;
 			}
 			if (cCount == text.Length)
@@ -78,12 +87,9 @@ namespace temperature_class
 		}
 
 		public static Boolean validateUnits(string text){
-			switch (text) {
-			case TempUnit.C:
-				return true;			
-			case TempUnit.F:
+			if(text == "f" || text == "F" || text == "c" || text == "C" )
 				return true;
-			default:
+			else
 				return false;
 			}
 		}
@@ -114,6 +120,11 @@ namespace temperature_class
 		public static void MainHeader(){
 			Console.WriteLine ("Welcome to the temperature program.");
 			Dashes ();
+			return;
+		}
+		public static void InvalidUnit(){
+			Console.WriteLine ("I'm sorry, that isn't a valid unit.");
+			Separator.Dashes ();
 			return;
 		}
 		public static void InvalidTemp(){
@@ -183,13 +194,5 @@ namespace temperature_class
 			patientId = id;
 		}
 	}
+	
 
-	/// <summary>
-	/// Acceptable temp units.
-	/// </summary>
-	enum TempUnit
-	{
-		C,
-		F
-	}
-}
