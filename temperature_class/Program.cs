@@ -113,14 +113,18 @@ namespace temperature_class
 
 		public static Boolean validateSite(string text){
 			// TODO: need to validate that text only has numeric chars
-			var upperBound = (LineOutputs.sites.GetUpperBound (0) + 1);
-			var lowerBound = 1;
-			var boundTest = Convert.ToInt32 (text);
-			if (boundTest > upperBound || boundTest < lowerBound)
+			var textChar = Convert.ToChar(text);
+			if (text.Length > 1 || !Char.IsNumber (textChar)) {
 				return false;
-			else
-				return true;
-
+			} else {
+				var upperBound = (LineOutputs.sites.GetUpperBound (0) + 1);
+				var lowerBound = 1;
+				var boundTest = Convert.ToInt32 (text);
+				if (boundTest > upperBound || boundTest < lowerBound)
+					return false;
+				else
+					return true;
+			}
 		}
 
 		public static Boolean validateId(string idText){
