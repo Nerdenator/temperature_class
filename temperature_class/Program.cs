@@ -6,8 +6,11 @@ namespace temperature_class
 	{
 		public static void Main (string[] args)
 		{
+			// variables for validation
 			Boolean numOnly = false; // value to see if ID is numeric only. Gets set to true if validation is positive
 			Boolean correctTemp = false; // value to see if temp is actually a temp. Gets set to true if validation is positive. 
+
+
 			// print main header, then ask for person id to store the information under
 			LineOutputs.MainHeader ();
 			LineOutputs.EnterPersonId ();
@@ -40,7 +43,9 @@ namespace temperature_class
 			// ask for temp unit
 		}
 	}
-
+	/// <summary>
+	/// Validators. Used to make sure user input does not contain incorrect data that could corrupt the data set.
+	/// </summary>
 	class Validators
 	{
 		public static Boolean validateId(string idText){
@@ -69,6 +74,10 @@ namespace temperature_class
 		}
 	}
 
+	/// <summary>
+	/// Base class that contains Dashes(), making it to where one need not include it in 
+	/// printed message methods.
+	/// </summary>
 	class Separator
 	{
 		protected static void Dashes()
@@ -82,7 +91,9 @@ namespace temperature_class
 	}
 
 
-
+	/// <summary>
+	/// The "View" for the application. Inherits from Separator for its Dashes() method.
+	/// </summary>
 	class LineOutputs : Separator
 	{
 		public static void MainHeader(){
@@ -118,6 +129,10 @@ namespace temperature_class
 		}
 	}
 
+
+	/// <summary>
+	/// The model for the data. Acts as the "bucket" for our data.
+	/// </summary>
 	class TempSubject
 	{
 		// fields
@@ -153,8 +168,6 @@ namespace temperature_class
 			patientId = id;
 		}
 	}
-
-
 
 	enum TempUnit
 	{
