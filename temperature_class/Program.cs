@@ -9,7 +9,7 @@ namespace temperature_class
 			// variables for validation
 			Boolean numOnly = false; // value to see if ID is numeric only. Gets set to true if validation is positive
 			Boolean correctTemp = false; // value to see if temp is actually a temp. Gets set to true if validation is positive. 
-
+			Boolean correctUnit = false; // value to see if unit is valid. Gets set to true if validation is positive. 
 
 			// print main header, then ask for person id to store the information under
 			LineOutputs.MainHeader ();
@@ -40,7 +40,11 @@ namespace temperature_class
 			// dump into object
 			subject.PatientTemp = validatedTemp;
 
+
 			// ask for temp unit
+			LineOutputs.EnterUnits();
+
+
 		}
 	}
 	/// <summary>
@@ -71,6 +75,17 @@ namespace temperature_class
 				return true;
 			else
 				return false;
+		}
+
+		public static Boolean validateUnits(string text){
+			switch (text) {
+			case TempUnit.C:
+				return true;			
+			case TempUnit.F:
+				return true;
+			default:
+				return false;
+			}
 		}
 	}
 
@@ -169,6 +184,9 @@ namespace temperature_class
 		}
 	}
 
+	/// <summary>
+	/// Acceptable temp units.
+	/// </summary>
 	enum TempUnit
 	{
 		C,
