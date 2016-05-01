@@ -1,0 +1,13 @@
+﻿<Properties StartupItem="temperature_class/temperature_class.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="temperature_class/Program.cs">
+    <Files>
+      <File FileName="temperature_class/Program.cs" Line="33" Column="4" />
+      <File FileName="temperature_class/IValidate.cs" Line="7" Column="26" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

@@ -1,0 +1,5 @@
+/home/aaron/monoprojects/temperature_class/temperature_class/obj/x86/Debug/.NETFramework,Version=v4.5.AssemblyAttribute.cs
+/home/aaron/monoprojects/temperature_class/temperature_class/bin/Debug/temperature_class.exe.mdb
+/home/aaron/monoprojects/temperature_class/temperature_class/bin/Debug/temperature_class.exe
+/home/aaron/monoprojects/temperature_class/temperature_class/obj/x86/Debug/temperature_class.exe
+/home/aaron/monoprojects/temperature_class/temperature_class/obj/x86/Debug/temperature_class.exe.mdb
