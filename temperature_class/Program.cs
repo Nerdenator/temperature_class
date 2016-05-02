@@ -44,10 +44,14 @@ namespace temperature_class
 				var validateInfo = confirmFinal();
 				if (validateInfo == true) {
 					string fileLine = subject.PatientId + "," + subject.PatientTemp + "," + subject.TemperatureUnit + "," + subject.TemperatureLocation + "," + DateTime.UtcNow;
-					if (Environment.OSVersion.Platform.ToString () == "Unix") {
-						File.AppendAllText (@"/home/" + Environment.UserName + "/temperature_class_file.csv", fileLine);
-
-					}
+                    if (Environment.OSVersion.Platform.ToString() == "Unix")
+                    {
+                        File.AppendAllText(@"/home/" + Environment.UserName + "/temperature_class_file.csv", fileLine);
+                    }
+                    else if (Environment.OSVersion.Platform.ToString() == "Win32NT")
+                    {
+                        File.AppendAllText(@"C:\\Users\\" + Environment.UserName + "\\temperature_class_file.csv", fileLine);
+                    }
 					Console.WriteLine ("Add another set of data? (y/n): ");
 					var selection = Console.ReadLine ();
 					if (selection == "y" || selection == "Y") {
